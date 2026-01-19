@@ -1,27 +1,108 @@
 import { useState } from "react";
-import api from "../api";
+import { useNavigate } from "react-router-dom";
+import api from "../src/api";
+import "../src/App.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const login = async () => {
+  const login = async (e) => {
+    e?.preventDefault();
+    setError("");
     try {
       const res = await api.post("/login", { email, password });
       localStorage.setItem("token", res.data.token);
-      window.location = "/products";
-    } catch {
-      alert("Login failed");
+      navigate("/products");
+    } catch (err) {
+      setError(err.response?.data?.detail || "Login failed");
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
-      <input placeholder="Password" type="password" onChange={e => setPassword(e.target.value)} />
-      <button onClick={login}>Login</button>
-      <p onClick={() => window.location="/signup"}>Create Account</p>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <h2 style={styles.title}>Login</h2>
+        {error && <p style={styles.error}>{error}</p>}
+        <form onSubmit={login}>
+          <input
+            style={styles.input}
+            placeholder="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            style={styles.input}
+            placeholder="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit" style={styles.button}>Login</button>
+        </form>
+        <p style={styles.link} onClick={() => navigate("/signup")}>
+          Don't have an account? Sign up
+        </p>
+      </div>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+  },
+  card: {
+    backgroundColor: "white",
+    padding: "2rem",
+    borderRadius: "8px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    width: "100%",
+    maxWidth: "400px",
+  },
+  title: {
+    textAlign: "center",
+    marginBottom: "1.5rem",
+    color: "#2c3e50",
+  },
+  input: {
+    width: "100%",
+    padding: "0.75rem",
+    marginBottom: "1rem",
+    border: "1px solid #ddd",
+    borderRadius: "4px",
+    fontSize: "1rem",
+    boxSizing: "border-box",
+  },
+  button: {
+    width: "100%",
+    padding: "0.75rem",
+    backgroundColor: "#3498db",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    fontSize: "1rem",
+    cursor: "pointer",
+    marginBottom: "1rem",
+  },
+  error: {
+    color: "red",
+    marginBottom: "1rem",
+    textAlign: "center",
+  },
+  link: {
+    textAlign: "center",
+    color: "#3498db",
+    cursor: "pointer",
+    marginTop: "1rem",
+  },
+};
