@@ -1,6 +1,11 @@
 fastapi
-uvicorn
+uvicorn[standard]
 motor
-python-jose
+python-jose[cryptography]
 passlib[bcrypt]
-pydantic
+pydantic[email]
+python-multipart
+stripe
+requests
+geopy
+python-dateutil
